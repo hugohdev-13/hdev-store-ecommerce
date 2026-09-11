@@ -2,8 +2,9 @@
 from decimal import Decimal
 from uuid import uuid4
 
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.shortcuts import redirect, render
+from django.views import View
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from .forms import PedidoForm
@@ -98,3 +99,19 @@ def confirmacion_pedido(request):
     if not pedido:
         return redirect("ventas:lista_productos")
     return render(request, "ventas/confirmacion.html", {"pedido": pedido})
+
+
+class SalesDataView(View):
+    """Importes académicos en MXN; no representan pedidos reales ni sesiones."""
+
+    def get(self, request, *args, **kwargs):
+        data = {
+            "labels": ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"],
+            "sales": [12000, 18500, 14300, 22100, 19800, 26500],
+        }
+        return JsonResponse(data)
+
+
+@require_GET
+def sales_chart(request):
+    return render(request, "ventas/sales_chart.html")

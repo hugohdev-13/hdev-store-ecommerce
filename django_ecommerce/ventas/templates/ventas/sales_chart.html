@@ -1,0 +1,19 @@
+﻿{% extends 'ventas/base.html' %}
+{% load static %}
+{% block title %}Gráfica de Ventas | HDev Store{% endblock %}
+{% block content %}
+<h1>Gráfica de Ventas</h1>
+<p class="intro">Ventas mensuales de enero a junio, expresadas en MXN.</p>
+<p>Datos de demostración para la actividad académica. No representan compras reales.</p>
+<section class="panel" aria-label="Ventas mensuales de demostración">
+  <p id="salesStatus" role="status" aria-live="polite">Cargando datos de ventas…</p>
+  <div style="position: relative; height: 360px; width: 100%;">
+    <canvas id="salesChart" data-url="{% url 'ventas:sales_data' %}" role="img" aria-label="Gráfica de barras de ventas mensuales en MXN" aria-describedby="salesStatus"></canvas>
+  </div>
+  <noscript>Activa JavaScript para consultar la gráfica de ventas.</noscript>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'ventas/js/sales_chart.js' %}"></script>
+{% endblock %}
