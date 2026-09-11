@@ -9,8 +9,15 @@ DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
 ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
 INSTALLED_APPS = [
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
     "django.contrib.staticfiles",
     "ventas.apps.VentasConfig",
+    "order_manager.apps.OrderManagerConfig",
+    "address.apps.AddressConfig",
+    "billing_profile.apps.BillingProfileConfig",
+    "cart.apps.CartConfig",
+    "product.apps.ProductConfig",
 ]
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -30,10 +37,10 @@ TEMPLATES = [{
 }]
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
-# Compatibilidad con los comandos migrate y TestCase; no hay modelos ni tablas.
+# SQLite local conserva los modelos de la actividad entre ejecuciones.
 DATABASES = {"default": {
     "ENGINE": "django.db.backends.sqlite3",
-    "NAME": ":memory:",
+    "NAME": BASE_DIR / "db.sqlite3",
 }}
 
 # El carrito y el último pedido viven en archivos del servidor, no en la BD.
