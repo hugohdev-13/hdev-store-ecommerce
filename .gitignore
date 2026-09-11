@@ -5,3 +5,10 @@ playwright-report/
 test-results/
 *.local
 .env
+
+# Django: entorno local, sesiones y archivos generados
+django_ecommerce/venv/
+__pycache__/
+*.py[cod]
+*.sqlite3
+django_ecommerce/.sessions/

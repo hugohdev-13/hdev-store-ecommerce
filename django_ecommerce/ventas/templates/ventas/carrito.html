@@ -1,0 +1,22 @@
+{% extends 'ventas/base.html' %}
+{% block title %}Carrito | HDev Store{% endblock %}
+{% block content %}
+<h1>Tu carrito</h1>
+{% if items %}
+<div class="panel tabla-contenedor">
+<table>
+  <caption>Productos seleccionados</caption>
+  <thead><tr><th scope="col">Producto</th><th scope="col">Cantidad</th><th scope="col">Precio</th><th scope="col">Subtotal</th><th scope="col">Acciones</th></tr></thead>
+  <tbody>{% for item in items %}<tr>
+    <th scope="row">{{ item.nombre }}</th><td>{{ item.cantidad }}</td>
+    <td>${{ item.precio|floatformat:2 }} MXN</td><td>${{ item.subtotal|floatformat:2 }} MXN</td>
+    <td><form method="post" action="{% url 'ventas:eliminar_carrito' item.id %}">{% csrf_token %}<button class="enlace" type="submit">Eliminar<span class="sr-only"> {{ item.nombre }}</span></button></form></td>
+  </tr>{% endfor %}</tbody>
+</table>
+</div>
+<p class="precio">Total: ${{ total|floatformat:2 }} MXN</p>
+<div class="acciones"><a class="boton" href="{% url 'ventas:procesar_pedido' %}">Continuar con la compra</a><a href="{% url 'ventas:lista_productos' %}">Seguir comprando</a></div>
+{% else %}
+<div class="panel"><p>Tu carrito está vacío. Encuentra el equipo ideal para tu próximo proyecto.</p><a class="boton" href="{% url 'ventas:lista_productos' %}">Ver productos</a></div>
+{% endif %}
+{% endblock %}

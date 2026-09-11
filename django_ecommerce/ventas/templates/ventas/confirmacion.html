@@ -1,0 +1,15 @@
+{% extends 'ventas/base.html' %}
+{% block title %}Pedido confirmado | HDev Store{% endblock %}
+{% block content %}
+<p class="etiqueta">GRACIAS POR ELEGIR HDEV STORE</p>
+<h1>¡Compra realizada correctamente!</h1>
+<section class="panel">
+  <h2>Detalle de tu pedido</h2>
+  <p>Número de pedido: <strong>{{ pedido.numero }}</strong></p>
+  <p>Cliente: <strong>{{ pedido.cliente.nombre }}</strong></p>
+  <h3>Productos comprados</h3>
+  <ul class="resumen">{% for item in pedido.items %}<li><strong>{{ item.nombre }}</strong><br>Cantidad: {{ item.cantidad }} · ${{ item.precio|floatformat:2 }} MXN c/u<br>Subtotal: ${{ item.subtotal|floatformat:2 }} MXN</li>{% endfor %}</ul>
+  <p class="precio">Total: ${{ pedido.total|floatformat:2 }} MXN</p>
+  <a class="boton" href="{% url 'ventas:lista_productos' %}">Volver a la tienda</a>
+</section>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'ventas/base.html' %}
+{% block title %}Checkout | HDev Store{% endblock %}
+{% block content %}
+<h1>Finalizar compra</h1>
+<p class="intro">Completa tus datos de envío para confirmar este pedido de demostración.</p>
+<div class="checkout">
+  <section class="panel">
+    <h2>Datos de envío</h2>
+    <form method="post">
+      {% csrf_token %}
+      {% if formulario.errors %}<p role="alert" class="error">Revisa los campos indicados antes de confirmar.</p>{% endif %}
+      {{ formulario.as_p }}
+      <button type="submit">Confirmar pedido</button>
+    </form>
+  </section>
+  <aside class="panel">
+    <h2>Resumen del pedido</h2>
+    <ul class="resumen">{% for item in items %}<li><strong>{{ item.nombre }}</strong><br>Cantidad: {{ item.cantidad }} · ${{ item.precio|floatformat:2 }} MXN c/u<br>Subtotal: ${{ item.subtotal|floatformat:2 }} MXN</li>{% endfor %}</ul>
+    <p class="precio">Total: ${{ total|floatformat:2 }} MXN</p>
+    <a href="{% url 'ventas:ver_carrito' %}">Volver al carrito</a>
+  </aside>
+</div>
+{% endblock %}

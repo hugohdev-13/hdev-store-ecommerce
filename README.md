@@ -137,3 +137,132 @@ Las ilustraciones SVG se crearon para este proyecto y se distribuyen dentro del 
 ## Autor
 
 Héctor Hugo Hernández
+
+## Vistas del e-commerce — Django
+
+Actividad académica **Vistas del e-commerce**: configurar vistas funcionales, URLs,
+plantillas y un carrito con sesiones en Django. La implementación está separada en
+`django_ecommerce/`; React continúa ejecutándose con Vite y conserva su propio estado.
+Las secciones anteriores describen el frontend React.
+
+### Organización
+
+```text
+django_ecommerce/
+  manage.py
+  requirements.txt
+  ENTREGA.md                  # Guía y código principal para el PDF
+  config/
+    __init__.py
+    settings.py               # App ventas, middleware, sesiones y templates
+    urls.py                   # include("ventas.urls") en la raíz
+    asgi.py
+    wsgi.py
+  ventas/
+    __init__.py
+    apps.py
+    forms.py                  # Validación de los cinco campos del checkout
+    views.py                  # Catálogo, carrito, pedido y confirmación
+    urls.py                   # Seis rutas con namespace ventas
+    tests.py                  # TestCase y reverse, 16 pruebas
+    templates/ventas/
+      base.html
+      ventas.html
+      carrito.html
+      checkout.html
+      confirmacion.html
+    static/ventas/estilos.css
+```
+
+Se tomó como referencia [nickjj/docker-django-example](https://github.com/nickjj/docker-django-example),
+en particular la separación de configuración en `config/`, aplicaciones Django
+independientes y opciones de configuración mediante variables de entorno.
+Esta actividad adapta esas ideas a Python en Windows, sin requerir Docker,
+PostgreSQL, Redis ni Celery. No se copió ni reemplazó el frontend existente.
+
+### Vistas, templates y sesiones
+
+`ventas` se registra mediante `ventas.apps.VentasConfig` en `INSTALLED_APPS`.
+`config/urls.py` incluye `ventas.urls` en `/`, con `app_name = "ventas"`.
+Los templates usan herencia, `{% for %}`, `{{ variable }}`, `{% url %}` y CSRF.
+
+- `lista_productos`: muestra seis diccionarios de productos y precios en MXN mediante `render()`.
+- `agregar_carrito`: recibe el ID, incrementa la cantidad en `request.session["carrito"]` y redirige.
+- `ver_carrito`: calcula cantidades, precios, subtotales y total con `Decimal` y renderiza el carrito.
+- `eliminar_carrito`: elimina la línea completa de la sesión y redirige. La acción aparece como botón de enlace dentro de un formulario POST con CSRF.
+- `procesar_pedido`: GET muestra el formulario; POST valida nombre, correo, dirección, ciudad y CP mexicano de cinco dígitos mediante `PedidoForm`.
+- `confirmacion_pedido`: renderiza número simulado, cliente, productos, cantidades e importes desde `request.session["pedido"]`.
+
+El carrito guarda únicamente IDs como cadenas y cantidades. Los precios se obtienen
+del catálogo del servidor. Antes de vaciar el carrito se guarda una copia independiente
+del pedido; sus importes se convierten a cadenas para la serialización JSON de sesiones.
+La confirmación permanece al recargar y al agregar productos a un nuevo carrito.
+Se conserva únicamente el último pedido de cada sesión.
+
+Se utiliza el [backend de sesiones en archivos de Django](https://docs.djangoproject.com/en/5.2/topics/http/sessions/#using-file-based-sessions):
+los datos permanecen en `django_ecommerce/.sessions/`, excluido de Git, y el navegador
+recibe una cookie de identificación. La sesión expira tras una hora desde su última
+modificación. No hay modelos ni persistencia de negocio en una base de datos.
+SQLite en memoria se configura únicamente para compatibilidad con comandos administrativos
+y `TestCase`. `migrate` es opcional y responde que no hay migraciones.
+
+### Ejecución en Windows
+
+Requiere Python 3.10 o posterior compatible con Django 5.2; verificado con Python 3.12.10
+y Django 5.2.17. Desde PowerShell:
+
+```powershell
+cd "D:\EBAC\Tercer Proyecto\HDev_Store\django_ecommerce"
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+python manage.py migrate
+python manage.py check
+python manage.py test
+python manage.py runserver
+```
+
+Si PowerShell bloquea la activación, usa el ejecutable del entorno directamente,
+sin cambiar la política de ejecución:
+
+```powershell
+.\venv\Scripts\python.exe -m pip install -r requirements.txt
+.\venv\Scripts\python.exe manage.py check
+.\venv\Scripts\python.exe manage.py test
+.\venv\Scripts\python.exe manage.py runserver
+```
+
+En CMD, la activación equivalente es `venv\Scripts\activate.bat`.
+Abre **http://127.0.0.1:8000/**. React puede seguir funcionando en otra terminal
+con `npm.cmd run dev` desde la raíz, normalmente en el puerto 5173.
+
+### URLs de Django
+
+| Método    | URL                                    | Nombre dentro de `ventas` |
+| --------- | -------------------------------------- | ------------------------- |
+| GET       | `/`                                    | `lista_productos`         |
+| GET       | `/carrito/`                            | `ver_carrito`             |
+| POST      | `/carrito/agregar/<int:producto_id>/`  | `agregar_carrito`         |
+| POST      | `/carrito/eliminar/<int:producto_id>/` | `eliminar_carrito`        |
+| GET, POST | `/checkout/`                           | `procesar_pedido`         |
+| GET       | `/confirmacion/`                       | `confirmacion_pedido`     |
+
+Agregar y eliminar se ejecutan con los botones de la tienda, no escribiendo esas URLs
+en la barra del navegador (GET devuelve 405). Un ID inexistente devuelve 404.
+El checkout vacío redirige al carrito; la confirmación sin pedido redirige al catálogo.
+Los envíos inválidos muestran errores y conservan el carrito.
+
+### Validación y alcance
+
+`python manage.py check`: sin problemas. `python manage.py test`: 16 pruebas aprobadas.
+Se comprueban las seis URLs, los cuatro templates de pantalla, totales, cantidades,
+eliminación, validaciones, CSRF, sesiones separadas y conservación del pedido al vaciar
+el carrito. Las pruebas usan archivos temporales y verifican que comprar y agregar no
+realicen consultas a la base de datos. React: 19 pruebas aprobadas y build correcto.
+
+Demostración local: productos, número de pedido y compra son simulados; no hay cobros,
+autenticación ni envío de correos. No se comparte el carrito con React. La configuración
+incluye `DEBUG` local y una clave de desarrollo; no constituye configuración de producción.
+La guía [django_ecommerce/ENTREGA.md](django_ecommerce/ENTREGA.md) indica el código y
+las evidencias para el PDF. El futuro commit solicitado se llamará **Vistas del e-commerce**;
+no se creó commit ni se ejecutó push.

@@ -1,0 +1,18 @@
+{% load static %}
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}HDev Store{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'ventas/estilos.css' %}">
+</head>
+<body>
+  <header><nav aria-label="Navegación principal">
+    <a class="marca" href="{% url 'ventas:lista_productos' %}">HDev<span> Store</span></a>
+    <div class="acciones"><a href="{% url 'ventas:lista_productos' %}">Productos</a><a href="{% url 'ventas:ver_carrito' %}">Carrito</a></div>
+  </nav></header>
+  <main>{% block content %}{% endblock %}</main>
+  <footer>HDev Store · Tecnología para crear. Compra de demostración, sin cobros reales.</footer>
+</body>
+</html>
