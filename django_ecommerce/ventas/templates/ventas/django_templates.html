@@ -1,0 +1,22 @@
+﻿{% extends 'ventas/base.html' %}
+{% block title %}{{ titulo|title }} | HDev Store{% endblock %}
+{% block content %}
+<h1>{{ titulo|title }}</h1>
+<p class="intro">Demostración académica con productos en memoria, sin guardar datos.</p>
+<section class="panel" aria-label="Ejemplos de filtros">
+  <p>Mayúsculas: {{ subtitulo|upper }}</p>
+  <p>Minúsculas: {{ subtitulo|lower }}</p>
+  <p>Total de productos: {{ productos|length }}</p>
+</section>
+<div class="catalogo">
+{% for producto in productos %}
+  {% if forloop.counter|divisibleby:"3" %}
+    {% include 'ventas/includes/producto_card.html' with producto=producto numero=forloop.counter es_divisible=True primero=forloop.first ultimo=forloop.last only %}
+  {% else %}
+    {% include 'ventas/includes/producto_card.html' with producto=producto numero=forloop.counter es_divisible=False primero=forloop.first ultimo=forloop.last only %}
+  {% endif %}
+{% empty %}
+  <p class="panel">No hay productos de demostración disponibles.</p>
+{% endfor %}
+</div>
+{% endblock %}

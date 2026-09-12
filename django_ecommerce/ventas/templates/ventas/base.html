@@ -11,7 +11,7 @@
   <header><nav aria-label="Navegación principal">
     <a class="marca" href="{% url 'ventas:lista_productos' %}">HDev<span> Store</span></a>
     <div class="acciones"><a href="{% url 'ventas:lista_productos' %}">Productos</a><a href="{% url 'ventas:ver_carrito' %}">Carrito</a></div>
-  <a href="{% url 'ventas:sales_chart' %}">Gráfica de Ventas</a><a href="{% url 'ventas:registro_usuario' %}">Registrarse</a></nav></header>
+  <a href="{% url 'ventas:sales_chart' %}">Gráfica de Ventas</a><a href="{% url 'ventas:registro_usuario' %}">Registrarse</a><a href="{% url 'ventas:django_templates_demo' %}">Django Templates</a></nav></header>
   <main>{% block content %}{% endblock %}</main>
   <footer>HDev Store · Tecnología para crear. Compra de demostración, sin cobros reales.</footer>
   {% block scripts %}{% endblock %}

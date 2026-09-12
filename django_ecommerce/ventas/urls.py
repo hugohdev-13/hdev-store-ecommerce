@@ -3,6 +3,7 @@ from . import views
 
 app_name = "ventas"
 urlpatterns = [
+    path("templates-demo/", views.django_templates_demo, name="django_templates_demo"),
     path("registro/", views.registro_usuario, name="registro_usuario"),
     path("ventas/grafica/", views.sales_chart, name="sales_chart"),
     path("ventas/datos/", views.SalesDataView.as_view(), name="sales_data"),

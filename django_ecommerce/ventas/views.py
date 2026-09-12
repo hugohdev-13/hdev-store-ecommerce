@@ -126,3 +126,20 @@ def registro_usuario(request):
         messages.success(request, "Tu cuenta se creó correctamente.")
         return redirect("ventas:registro_usuario")
     return render(request, "ventas/registro.html", {"formulario": formulario})
+
+
+@require_GET
+def django_templates_demo(request):
+    productos_demo = [
+        {"nombre": "Laptop Gamer", "descripcion": "Equipo para desarrollo y entretenimiento", "precio": Decimal("24599.90"), "categoria": "computadoras"},
+        {"nombre": "Monitor Full HD", "descripcion": "Monitor de 24 pulgadas para escritorio", "precio": Decimal("3899.50"), "categoria": "monitores"},
+        {"nombre": "Teclado Mecánico", "descripcion": "Teclado para programación y gaming", "precio": Decimal("1499.00"), "categoria": "accesorios"},
+        {"nombre": "Mouse Inalámbrico", "descripcion": "Mouse ergonómico de uso diario", "precio": Decimal("799.90"), "categoria": "accesorios"},
+        {"nombre": "SSD 1 TB", "descripcion": "Unidad de almacenamiento de estado sólido", "precio": Decimal("1699.00"), "categoria": "almacenamiento"},
+        {"nombre": "Memoria RAM 16 GB", "descripcion": "Memoria para ampliar el rendimiento", "precio": Decimal("1299.00"), "categoria": "componentes"},
+    ]
+    return render(request, "ventas/django_templates.html", {
+        "titulo": "django templates",
+        "subtitulo": "Filtros, ciclos, herencia e include",
+        "productos": productos_demo,
+    })

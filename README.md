@@ -266,3 +266,217 @@ incluye `DEBUG` local y una clave de desarrollo; no constituye configuración de
 La guía [django_ecommerce/ENTREGA.md](django_ecommerce/ENTREGA.md) indica el código y
 las evidencias para el PDF. El futuro commit solicitado se llamará **Vistas del e-commerce**;
 no se creó commit ni se ejecutó push.
+
+## Modelos del e-commerce — Django
+
+La actividad **Modelos del e-commerce** amplía el proyecto Django existente con cinco
+aplicaciones y sus modelos. `ventas` mantiene sus vistas, templates, formularios,
+URLs y carrito por sesión; el frontend React permanece independiente.
+
+### Aplicaciones, modelos y relaciones
+
+| Aplicación        | Modelo           | Campos y relaciones                               |
+| ----------------- | ---------------- | ------------------------------------------------- |
+| `product`         | `Product`        | Nombre, descripción y precio decimal              |
+| `address`         | `Address`        | Calle, ciudad, estado, país y código postal       |
+| `billing_profile` | `BillingProfile` | ForeignKey a User y Address                       |
+| `cart`            | `Cart`           | ForeignKey a User y ManyToMany a Product          |
+| `order_manager`   | `Order`          | OneToOne a Cart, total decimal y fecha automática |
+
+Relaciones: User 1 → N BillingProfile; Address 1 → N BillingProfile;
+User 1 → N Cart; Cart N ↔ N Product; Cart 1 ↔ 1 Order.
+Un carrito puede existir sin pedido; cada pedido exige un carrito y no puede haber
+dos pedidos del mismo carrito. Las claves foráneas usan `on_delete=models.CASCADE`.
+Los modelos incluyen `__str__` y únicamente los campos solicitados, más la clave
+primaria automática de Django.
+
+Se registraron las cinco aplicaciones junto con `ventas`, `django.contrib.auth` y
+`django.contrib.contenttypes`. Estas dos aplicaciones de Django proporcionan el
+modelo User y sus dependencias; no se añadió una interfaz de autenticación.
+
+**Actualización respecto a la actividad de vistas:** ahora la base de datos es
+SQLite persistente en `django_ecommerce/db.sqlite3`, excluida de Git. La descripción
+anterior de SQLite en memoria y migraciones opcionales corresponde a la primera
+actividad. Para esta actividad sí se debe ejecutar `migrate`. Los datos del carrito
+y pedido simulado de `ventas` continúan en sesiones en archivos; todavía no utilizan
+los nuevos modelos.
+
+### Migraciones y ejecución
+
+Desde PowerShell, usando el entorno ya existente:
+
+```powershell
+cd "D:\EBAC\Tercer Proyecto\HDev_Store\django_ecommerce"
+.\venv\Scripts\python.exe manage.py migrate
+.\venv\Scripts\python.exe manage.py check
+.\venv\Scripts\python.exe manage.py makemigrations --check
+.\venv\Scripts\python.exe manage.py test
+.\venv\Scripts\python.exe manage.py runserver
+```
+
+Para una instalación nueva, crear el entorno e instalar `requirements.txt` como se
+explica en la sección anterior. Con el entorno activado se puede usar `python`
+en lugar de `.\venv\Scripts\python.exe`. La tienda sigue en http://127.0.0.1:8000/.
+
+Se generó `migrations/0001_initial.py` en cada nueva aplicación mediante
+`python manage.py makemigrations`. Se aplicaron las cinco migraciones propias y
+las 14 migraciones de `auth` y `contenttypes`: 19 en total, todas con resultado `OK`.
+Se verificaron las tablas de los cinco modelos y la tabla intermedia `cart_cart_products`.
+
+### Pruebas y entrega
+
+- `python manage.py check`: `System check identified no issues (0 silenced).`
+- `python manage.py makemigrations --check`: `No changes detected`.
+- `python manage.py test`: **26 pruebas aprobadas**, 10 nuevas y las 16 de `ventas`.
+- Las nuevas pruebas usan `TestCase` y `User`, consultan registros guardados y revisan
+  decimales, direcciones, relaciones, fecha automática, unicidad y eliminación en cascada.
+- Las pruebas emplean una base temporal y no guardan datos ficticios en la base local.
+
+El código completo de los cinco modelos, relaciones, inventario y resultados reales
+se encuentra en [ENTREGA_MODELOS.md](django_ecommerce/ENTREGA_MODELOS.md), preparado
+para incorporarlo al PDF. La guía anterior `django_ecommerce/ENTREGA.md` conserva
+la evidencia histórica de la actividad de vistas.
+
+Los modelos son académicos: no hay pagos ni procesamiento real de órdenes.
+`Cart.products` no registra cantidades y `Order.total` se asigna explícitamente;
+no se añadieron campos ni reglas adicionales al ejercicio. Las relaciones sirven
+como base para futuras funcionalidades.
+
+No se creó un repositorio ni se realizó commit o push en esta actividad.
+El futuro commit solicitado será exactamente **Modelos del e-commerce**.
+
+## Registrando modelos en el Django Admin
+
+Se registraron los modelos existentes **Product, Address, BillingProfile, Cart y Order**
+con `@admin.register`, equivalente a `admin.site.register`, y clases `ModelAdmin`
+sencillas con columnas descriptivas y búsquedas. Order continúa en `order_manager`.
+No se cambiaron los modelos ni el flujo de compra de `ventas`.
+
+El panel está disponible en **http://127.0.0.1:8000/admin/**. Para usarlo, desde
+PowerShell y dentro del proyecto Django:
+
+```powershell
+cd "D:\EBAC\Tercer Proyecto\HDev_Store\django_ecommerce"
+.\venv\Scripts\python.exe manage.py makemigrations
+.\venv\Scripts\python.exe manage.py migrate
+.\venv\Scripts\python.exe manage.py createsuperuser
+.\venv\Scripts\python.exe manage.py runserver
+```
+
+Ejecuta `createsuperuser` únicamente si necesitas crear el administrador local.
+En esta revisión no se encontró un superusuario activo y no se creó ninguno.
+Introduce sus datos de forma interactiva; no los guardes en el repositorio.
+Con el entorno activado puedes usar `python` en lugar de la ruta al ejecutable.
+
+Se habilitaron las aplicaciones Admin, sessions y messages, el middleware de
+Autenticación y mensajes y sus procesadores de contexto. Las sesiones siguen en
+archivos: registrar `django.contrib.sessions` no cambia `SESSION_ENGINE`.
+El Admin gestiona los datos de SQLite; el catálogo y checkout de `ventas` continúan
+usando los datos simulados de las actividades anteriores.
+
+Validación desde `django_ecommerce/`:
+
+```powershell
+.\venv\Scripts\python.exe manage.py check
+.\venv\Scripts\python.exe manage.py makemigrations --check
+.\venv\Scripts\python.exe manage.py test
+.\venv\Scripts\python.exe manage.py showmigrations
+```
+
+`check` no detectó problemas y `makemigrations` y `makemigrations --check` respondieron
+`No changes detected`. Se aplicaron tres migraciones internas de Admin y una de
+sessions; las 23 migraciones del proyecto aparecen aplicadas. Pasaron **34 pruebas**:
+las 26 anteriores y ocho nuevas de integración del Admin, permisos, formularios,
+registro de modelos, creación de producto y conservación de URLs de ventas.
+
+El código y resultados para el PDF están en
+[ENTREGA_ADMIN.md](django_ecommerce/ENTREGA_ADMIN.md). Es una implementación académica
+para gestionar datos; no agrega pagos ni procesamiento real de pedidos.
+No se ejecutaron `git add`, `git commit` ni `git push` en esta actividad.
+El futuro commit será **Registrando modelos en el Django Admin**.
+
+## Gráfica de Ventas
+
+Gráfica de barras con Chart.js cargado desde el CDN jsDelivr indicado por su
+[documentación oficial](https://www.chartjs.org/docs/latest/getting-started/).
+La página extiende la plantilla base de HDev Store y se abre desde la navegación.
+
+- Página: http://127.0.0.1:8000/ventas/grafica/.
+- Endpoint JSON: http://127.0.0.1:8000/ventas/datos/.
+- `SalesDataView.get()` devuelve `labels` y `sales` mediante `JsonResponse`.
+- `sales_chart.js` utiliza `fetch()` para solicitar el JSON por GET sin recargar.
+- Los datos son demostrativos: seis importes mensuales de enero a junio en MXN.
+  No provienen de Order ni del checkout por sesiones y no representan ventas reales.
+- La página muestra errores de carga y un resumen textual de los valores.
+
+Desde `django_ecommerce/`, con el entorno existente:
+
+```powershell
+.\venv\Scripts\python.exe manage.py check
+.\venv\Scripts\python.exe manage.py makemigrations --check
+.\venv\Scripts\python.exe manage.py test
+.\venv\Scripts\python.exe manage.py runserver
+```
+
+Validación: `check` sin problemas, `makemigrations --check` sin cambios y **38 pruebas
+aprobadas**, incluidas las 34 anteriores. No se añadieron modelos ni migraciones.
+Se requiere JavaScript y acceso al CDN para dibujar la gráfica.
+El código para el PDF está en [ENTREGA_GRAFICA_VENTAS.md](django_ecommerce/ENTREGA_GRAFICA_VENTAS.md).
+El futuro commit será **Gráfica de Ventas**. No se ejecutaron git add, commit ni push.
+
+## Forms
+
+Registro de usuarios Django en **http://127.0.0.1:8000/registro/**, accesible mediante
+«Registrarse». `RegistroUsuarioForm` hereda de `UserCreationForm`, un ModelForm
+especializado de Django para User. Permite username, nombre, apellidos, correo y
+confirmación de contraseña. El correo es obligatorio, se normaliza a minúsculas y
+se comprueba con email__iexact para rechazar duplicados.
+
+La vista acepta GET/POST, guarda únicamente formularios válidos mediante form.save(),
+muestra un mensaje de éxito y redirige al registro sin iniciar sesión automáticamente.
+Django almacena la contraseña con hash; CSRF protege el POST. Los usuarios se pueden
+consultar en el Admin existente, en Usuarios, con una cuenta administradora.
+
+Desde `django_ecommerce/`:
+
+```powershell
+.\venv\Scripts\python.exe manage.py check
+.\venv\Scripts\python.exe manage.py makemigrations --check
+.\venv\Scripts\python.exe manage.py test
+.\venv\Scripts\python.exe manage.py runserver
+```
+
+Resultados: check sin problemas, ninguna migración nueva y **47 pruebas aprobadas**
+(38 anteriores y nueve nuevas). Se comprobaron el formulario en Edge a 375 y 1440 px,
+y el flujo de creación, mensaje y consulta en Admin mediante pruebas Django aisladas.
+Código y pasos para el PDF en [ENTREGA_FORMS.md](django_ecommerce/ENTREGA_FORMS.md).
+La validación del correo se realiza en el formulario; el modelo User estándar no
+impone unicidad de email en la base de datos. No hay verificación de correo ni login
+público en esta actividad. React conserva su autenticación simulada independiente.
+No se ejecutaron git add, commit ni push. El futuro commit será exactamente **Forms**.
+
+## Django Templates
+
+Demostración académica en **http://127.0.0.1:8000/templates-demo/**, accesible desde
+la navegación existente. Utiliza filtros title, upper, lower, length, truncatechars
+y floatformat; un ciclo for con empty y forloop.counter, first y last; y divisibleby
+para marcar únicamente las posiciones 3 y 6.
+
+La página hereda de base.html. Un include reutilizable recibe explícitamente el
+producto, número, indicadores de primera/última posición y es_divisible mediante
+ramas if. Usa `only` para aislar el contexto del fragmento y las clases CSS existentes.
+Los seis productos son datos en memoria; no se guardan en la base de datos.
+
+Desde django_ecommerce, ejecutar:
+
+```powershell
+.\venv\Scripts\python.exe manage.py check
+.\venv\Scripts\python.exe manage.py makemigrations --check
+.\venv\Scripts\python.exe manage.py test
+.\venv\Scripts\python.exe manage.py runserver
+```
+
+Resultados: check sin problemas, ninguna migración nueva y **53 pruebas aprobadas**,
+incluidas las 47 anteriores. Código para el PDF en
+[ENTREGA_DJANGO_TEMPLATES.md](django_ecommerce/ENTREGA_DJANGO_TEMPLATES.md).
+El futuro commit será **Django Templates**. No se ejecutaron git add, commit ni push.

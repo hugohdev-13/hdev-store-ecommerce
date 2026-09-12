@@ -1,0 +1,9 @@
+﻿<article class="panel producto" data-posicion="{{ numero }}">
+  <p class="etiqueta">Producto {{ numero }} · {{ producto.categoria|title }}</p>
+  <h2>{{ producto.nombre|upper }}</h2>
+  <p>{{ producto.descripcion|truncatechars:45 }}</p>
+  <p class="precio">${{ producto.precio|floatformat:2 }} MXN</p>
+  {% if primero %}<p>Primer producto del listado</p>{% endif %}
+  {% if ultimo %}<p>Último producto del listado</p>{% endif %}
+  {% if es_divisible %}<p>Esta posición es divisible entre 3</p>{% endif %}
+</article>
