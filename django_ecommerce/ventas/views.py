@@ -2,12 +2,13 @@
 from decimal import Decimal
 from uuid import uuid4
 
+from django.contrib import messages
 from django.http import Http404, JsonResponse
 from django.shortcuts import redirect, render
 from django.views import View
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
-from .forms import PedidoForm
+from .forms import PedidoForm, RegistroUsuarioForm
 
 
 PRODUCTOS = [
@@ -115,3 +116,13 @@ class SalesDataView(View):
 @require_GET
 def sales_chart(request):
     return render(request, "ventas/sales_chart.html")
+
+
+@require_http_methods(["GET", "POST"])
+def registro_usuario(request):
+    formulario = RegistroUsuarioForm(request.POST if request.method == "POST" else None)
+    if request.method == "POST" and formulario.is_valid():
+        formulario.save()
+        messages.success(request, "Tu cuenta se creó correctamente.")
+        return redirect("ventas:registro_usuario")
+    return render(request, "ventas/registro.html", {"formulario": formulario})

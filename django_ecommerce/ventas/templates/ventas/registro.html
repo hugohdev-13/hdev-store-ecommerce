@@ -1,0 +1,15 @@
+﻿{% extends 'ventas/base.html' %}
+{% block title %}Registro de usuario | HDev Store{% endblock %}
+{% block content %}
+<h1>Registro de usuario</h1>
+<p class="intro">Crea tu cuenta en HDev Store.</p>
+{% for message in messages %}<p class="panel" role="status">{{ message }}</p>{% endfor %}
+<section class="panel" style="max-width: 640px; overflow-wrap: anywhere;">
+  <form method="post">
+    {% csrf_token %}
+    {% if formulario.errors %}<p class="error" role="alert">Revisa los campos indicados.</p>{% endif %}
+    {{ formulario.as_p }}
+    <button type="submit">Crear cuenta</button>
+  </form>
+</section>
+{% endblock %}

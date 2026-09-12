@@ -1,4 +1,6 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 
 
 class PedidoForm(forms.Form):
@@ -11,3 +13,22 @@ class PedidoForm(forms.Form):
         error_messages={"invalid": "Escribe un código postal de cinco dígitos."},
         widget=forms.TextInput(attrs={"inputmode": "numeric", "autocomplete": "postal-code"}),
     )
+
+
+class RegistroUsuarioForm(UserCreationForm):
+    email = forms.EmailField(label="Correo electrónico", required=True, max_length=254)
+
+    class Meta:
+        model = User
+        fields = ("username", "first_name", "last_name", "email", "password1", "password2")
+        labels = {
+            "username": "Nombre de usuario",
+            "first_name": "Nombre",
+            "last_name": "Apellidos",
+        }
+
+    def clean_email(self):
+        email = self.cleaned_data["email"].strip().lower()
+        if User.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError("Ya existe una cuenta con este correo electrónico.")
+        return email
