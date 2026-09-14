@@ -480,3 +480,7 @@ Resultados: check sin problemas, ninguna migración nueva y **53 pruebas aprobad
 incluidas las 47 anteriores. Código para el PDF en
 [ENTREGA_DJANGO_TEMPLATES.md](django_ecommerce/ENTREGA_DJANGO_TEMPLATES.md).
 El futuro commit será **Django Templates**. No se ejecutaron git add, commit ni push.
+
+## Paginación en Django Rest Framework
+
+`/api/productos/` lista productos con `PageNumberPagination`. El tamaño predeterminado es 4; `pagina` selecciona la página y `tamano` permite solicitar hasta 10 productos. Por ejemplo: `/api/productos/?pagina=2&tamano=2`. La respuesta incluye total, página actual, total de páginas, enlaces y resultados. Consulta [ENTREGA_PAGINACION_DRF.md](django_ecommerce/ENTREGA_PAGINACION_DRF.md).
