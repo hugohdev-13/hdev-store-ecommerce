@@ -484,3 +484,7 @@ El futuro commit será **Django Templates**. No se ejecutaron git add, commit ni
 ## Paginación en Django Rest Framework
 
 `/api/productos/` lista productos con `PageNumberPagination`. El tamaño predeterminado es 4; `pagina` selecciona la página y `tamano` permite solicitar hasta 10 productos. Por ejemplo: `/api/productos/?pagina=2&tamano=2`. La respuesta incluye total, página actual, total de páginas, enlaces y resultados. Consulta [ENTREGA_PAGINACION_DRF.md](django_ecommerce/ENTREGA_PAGINACION_DRF.md).
+
+## Autenticación en Django Rest Framework
+
+El backend Django usa `TokenAuthentication` e `IsAuthenticated` para proteger `GET /api/perfil/`, que devuelve únicamente el perfil del usuario autenticado. `POST /api/token/` recibe `username` y `password` y entrega el token. Para consultar el perfil, envía `Authorization: Token <token>`. No incluyas tokens reales en el repositorio. Consulta [ENTREGA_AUTENTICACION_DRF.md](django_ecommerce/ENTREGA_AUTENTICACION_DRF.md) para el flujo, pruebas y resultados.
