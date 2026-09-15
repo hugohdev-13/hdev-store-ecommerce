@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { screen } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderApp } from './render';
 import { ProductCard } from '../components/ProductCard';
@@ -12,6 +12,15 @@ import { money } from '../utils/format';
 import { createAppStore } from '../store/store';
 import { addToCart } from '../store/cartSlice';
 import App from '../App';
+vi.mock('../services/api', () => ({
+  fetchProducts: vi.fn().mockResolvedValue([]),
+  registerUser: vi.fn().mockResolvedValue({}),
+  signIn: vi.fn().mockImplementation(async (email: string) => ({ name: email.split('@')[0], email })),
+  createOrder: vi.fn().mockImplementation(async (items: { product: { price: number }; quantity: number }[]) => ({
+    id: 1, created_at: new Date().toISOString(),
+    total: String(items.reduce((sum, i) => sum + i.product.price * i.quantity, 0)),
+  })),
+}));
 describe('ProductCard', () => {
   it('renderiza nombre, precio y agrega mediante Redux', async () => {
     const user = userEvent.setup();
@@ -62,8 +71,8 @@ describe('Login', () => {
     await user.type(screen.getByLabelText('Correo electrónico'), 'demo@example.com');
     await user.type(screen.getByLabelText('Contraseña'), 'ejemplo123');
     await user.click(screen.getByRole('button', { name: 'Iniciar sesión' }));
-    expect(store.getState().auth.user?.email).toBe('demo@example.com');
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Tu espacio.');
+    await waitFor(() => expect(store.getState().auth.user?.email).toBe('demo@example.com'));
+    expect(await screen.findByRole('heading', { level: 1, name: /Tu espacio/ })).toBeInTheDocument();
   });
 });
 describe('Register', () => {
@@ -95,7 +104,7 @@ describe('Register', () => {
     }))
       await user.type(screen.getByLabelText(label), value);
     await user.click(screen.getByRole('button', { name: 'Crear cuenta' }));
-    expect(screen.getByRole('heading', { name: 'Iniciar sesión' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Iniciar sesión' })).toBeInTheDocument();
     expect(store.getState().auth.registeredUser).toEqual({
       name: 'Hugo Hernández',
       email: 'hugo@example.com',
@@ -157,9 +166,7 @@ describe('Checkout', () => {
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Guardar método de pago' }));
     await user.click(screen.getByRole('button', { name: 'Confirmar compra' }));
-    expect(
-      screen.getByRole('heading', { name: '¡Compra realizada correctamente!' }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: '¡Compra realizada correctamente!' })).toBeInTheDocument();
     expect(store.getState().cart.items).toEqual([]);
     const order = store.getState().checkout.order;
     expect(order?.total).toBe(31998);

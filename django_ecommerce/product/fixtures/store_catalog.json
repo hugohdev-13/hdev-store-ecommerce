@@ -1,0 +1,106 @@
+[
+    {
+        "model":  "product.product",
+        "pk":  1,
+        "fields":  {
+                       "name":  "HDev Pro 14",
+                       "description":  "Laptop Â· Ryzen 7 Â· 16 GB RAM Â· SSD 512 GB",
+                       "price":  "15999.00",
+                       "stock":  8,
+                       "available":  true,
+                       "created_at":  "2026-09-14T00:00:00Z",
+                       "updated_at":  "2026-09-14T00:00:00Z"
+                   }
+    },
+    {
+        "model":  "product.product",
+        "pk":  2,
+        "fields":  {
+                       "name":  "HDev Vision 27",
+                       "description":  "Monitor Â· 27 pulgadas Â· QHD Â· Panel IPS",
+                       "price":  "4499.00",
+                       "stock":  12,
+                       "available":  true,
+                       "created_at":  "2026-09-14T00:00:00Z",
+                       "updated_at":  "2026-09-14T00:00:00Z"
+                   }
+    },
+    {
+        "model":  "product.product",
+        "pk":  3,
+        "fields":  {
+                       "name":  "HDev Key Pro",
+                       "description":  "Teclado mecÃ¡nico Â· 75% Â· Switches tÃ¡ctiles",
+                       "price":  "1299.00",
+                       "stock":  20,
+                       "available":  true,
+                       "created_at":  "2026-09-14T00:00:00Z",
+                       "updated_at":  "2026-09-14T00:00:00Z"
+                   }
+    },
+    {
+        "model":  "product.product",
+        "pk":  4,
+        "fields":  {
+                       "name":  "HDev Precision",
+                       "description":  "Mouse inalÃ¡mbrico Â· 6 botones Â· 3,200 DPI",
+                       "price":  "699.00",
+                       "stock":  18,
+                       "available":  true,
+                       "created_at":  "2026-09-14T00:00:00Z",
+                       "updated_at":  "2026-09-14T00:00:00Z"
+                   }
+    },
+    {
+        "model":  "product.product",
+        "pk":  5,
+        "fields":  {
+                       "name":  "HDev Sound X",
+                       "description":  "AudÃ­fonos Â· Bluetooth Â· CancelaciÃ³n de ruido",
+                       "price":  "1899.00",
+                       "stock":  10,
+                       "available":  true,
+                       "created_at":  "2026-09-14T00:00:00Z",
+                       "updated_at":  "2026-09-14T00:00:00Z"
+                   }
+    },
+    {
+        "model":  "product.product",
+        "pk":  6,
+        "fields":  {
+                       "name":  "HDev Storage 1TB",
+                       "description":  "SSD NVMe Â· PCIe 4.0 Â· Hasta 5,000 MB/s",
+                       "price":  "1499.00",
+                       "stock":  15,
+                       "available":  true,
+                       "created_at":  "2026-09-14T00:00:00Z",
+                       "updated_at":  "2026-09-14T00:00:00Z"
+                   }
+    },
+    {
+        "model":  "product.product",
+        "pk":  7,
+        "fields":  {
+                       "name":  "HDev DDR5 32GB",
+                       "description":  "Memoria RAM Â· Kit 2 Ã— 16 GB Â· 5,600 MHz",
+                       "price":  "2499.00",
+                       "stock":  9,
+                       "available":  true,
+                       "created_at":  "2026-09-14T00:00:00Z",
+                       "updated_at":  "2026-09-14T00:00:00Z"
+                   }
+    },
+    {
+        "model":  "product.product",
+        "pk":  8,
+        "fields":  {
+                       "name":  "HDev Connect",
+                       "description":  "Hub USB-C Â· 7 en 1 Â· HDMI 4K Â· PD 100 W",
+                       "price":  "899.00",
+                       "stock":  25,
+                       "available":  true,
+                       "created_at":  "2026-09-14T00:00:00Z",
+                       "updated_at":  "2026-09-14T00:00:00Z"
+                   }
+    }
+]

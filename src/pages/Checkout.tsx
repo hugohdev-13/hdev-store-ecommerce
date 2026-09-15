@@ -22,6 +22,7 @@ import { clearCart } from '../store/cartSlice';
 import { placeOrder } from '../store/checkoutSlice';
 import type { Address } from '../types';
 import { validateAddress, validatePayment, type Payment } from '../utils/validation';
+import { createOrder } from '../services/api';
 const Fields = styled.div`
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -84,7 +85,7 @@ export function Checkout() {
     setPayment({ ...payment, [key]: value });
     setPaymentSaved(false);
   }
-  function confirm() {
+  async function confirm() {
     const errors = validateAddress(address);
     setAddressErrors(errors);
     if (Object.keys(errors).length) {
@@ -96,17 +97,14 @@ export function Checkout() {
       return;
     }
     if (!items.length) return;
-    dispatch(
-      placeOrder({
-        id: 'HD-' + crypto.randomUUID().slice(0, 8).toUpperCase(),
-        date: new Date().toISOString(),
+    try {
+      const saved = await createOrder(items, address);
+      dispatch(placeOrder({ id: `HD-${saved.id}`, date: saved.created_at,
         items: items.map((i) => ({ ...i, product: { ...i.product } })),
-        total: items.reduce((sum, i) => sum + i.quantity * i.product.price, 0),
-        address: { ...address },
-      }),
-    );
-    dispatch(clearCart());
-    navigate('/order-confirmation');
+        total: Number(saved.total), address: { ...address } }));
+      dispatch(clearCart());
+      navigate('/order-confirmation');
+    } catch { setError('No se pudo guardar la orden. Inicia sesión y revisa el stock disponible.'); }
   }
   if (!items.length)
     return (

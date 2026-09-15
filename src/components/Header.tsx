@@ -157,7 +157,7 @@ export function Header() {
               <UserRound size={20} />
               <span className="account-text">{user ? user.name.split(' ')[0] : 'Mi cuenta'}</span>
             </NavLink>
-            {user && <button onClick={() => dispatch(logout())}>Salir</button>}
+            {user && <button onClick={() => { sessionStorage.removeItem('hdev_token'); dispatch(logout()); }}>Salir</button>}
             <NavLink to="/cart" aria-label={'Carrito, ' + count + ' artículos'}>
               <ShoppingBag size={21} />
               <Badge>{count}</Badge>

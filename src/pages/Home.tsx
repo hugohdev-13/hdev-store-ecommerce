@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import {
@@ -15,7 +15,8 @@ import {
 } from 'lucide-react';
 import { Container, LinkButton, Muted } from '../components/common/UI';
 import { ProductGrid } from '../components/ProductGrid';
-import { products, categories } from '../data/products';
+import type { Product } from '../types';
+import { fetchProducts } from '../services/api';
 const Hero = styled.section`
   background: #edf2f8;
   overflow: hidden;
@@ -240,6 +241,17 @@ const Promo = styled.div`
 `;
 const categoryIcons = [Cpu, Laptop, Monitor, Keyboard, Headphones, Cpu, Cable];
 export function Home({ catalogOnly = false }: { catalogOnly?: boolean }) {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
+  const categories = ['Todos', ...new Set(products.map((p) => p.category))];
+  useEffect(() => {
+    let active = true;
+    fetchProducts().then((data) => { if (active) setProducts(data); })
+      .catch(() => { if (active) setLoadError('No se pudo cargar el catálogo. Verifica la conexión con Django.'); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, []);
   const [params, setParams] = useSearchParams();
   const category = params.get('category') ?? 'Todos';
   const query = params.get('q') ?? '';
@@ -372,7 +384,9 @@ export function Home({ catalogOnly = false }: { catalogOnly?: boolean }) {
             </select>
           </label>
         </Filters>
-        {visible.length ? (
+        {loading ? <Muted role="status">Cargando productos...</Muted> : loadError ? (
+          <Muted role="alert">{loadError}</Muted>
+        ) : visible.length ? (
           <ProductGrid products={visible} />
         ) : (
           <Muted role="status">No encontramos productos. Prueba otra búsqueda o categoría.</Muted>

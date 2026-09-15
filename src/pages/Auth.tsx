@@ -4,8 +4,10 @@ import styled from 'styled-components';
 import { ArrowRight, Code2 } from 'lucide-react';
 import { Page, Panel, Button, Notice, Muted, Stack } from '../components/common/UI';
 import { FormField } from '../components/common/FormField';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { useAppDispatch } from '../store/hooks';
 import { login, register } from '../store/authSlice';
+import { registerUser, signIn } from '../services/api';
+import axios from 'axios';
 const AuthLayout = styled(Page)`
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -53,7 +55,6 @@ export function Auth({ registration = false }: { registration?: boolean }) {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const registered = useAppSelector((s) => s.auth.registeredUser);
   const [values, setValues] = useState({
     name: '',
     lastName: '',
@@ -62,7 +63,8 @@ export function Auth({ registration = false }: { registration?: boolean }) {
     confirm: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  function submit(event: FormEvent) {
+  const [submitting, setSubmitting] = useState(false);
+  async function submit(event: FormEvent) {
     event.preventDefault();
     const next: Record<string, string> = {};
     if (registration && !values.name.trim()) next.name = 'Escribe tu nombre.';
@@ -77,15 +79,21 @@ export function Auth({ registration = false }: { registration?: boolean }) {
     setErrors(next);
     if (Object.keys(next).length) return;
     const email = values.email.trim().toLowerCase();
-    if (registration) {
-      dispatch(register({ name: values.name.trim() + ' ' + values.lastName.trim(), email }));
-      navigate('/login', { state: { registered: true } });
-    } else {
-      dispatch(
-        login({ name: registered?.email === email ? registered.name : email.split('@')[0], email }),
-      );
-      navigate('/');
-    }
+    setSubmitting(true);
+    try {
+      if (registration) {
+        await registerUser(values);
+        dispatch(register({ name: values.name.trim() + ' ' + values.lastName.trim(), email }));
+        navigate('/login', { state: { registered: true } });
+      } else {
+        dispatch(login(await signIn(email, values.password)));
+        navigate('/');
+      }
+    } catch (error) {
+      const detail = axios.isAxiosError(error) ? error.response?.data : null;
+      setErrors({ server: detail?.email?.[0] || detail?.password?.[0] || detail?.detail ||
+        'No se pudo completar la solicitud. Revisa tus datos y la conexión con Django.' });
+    } finally { setSubmitting(false); }
   }
   const field = (key: keyof typeof values, label: string, type = 'text', autoComplete?: string) => (
     <FormField
@@ -142,7 +150,8 @@ export function Auth({ registration = false }: { registration?: boolean }) {
             {registration &&
               field('confirm', 'Confirmación de contraseña', 'password', 'new-password')}
           </Stack>
-          <Button type="submit">
+          {errors.server && <Notice role="alert">{errors.server}</Notice>}
+          <Button type="submit" disabled={submitting}>
             {registration ? 'Crear cuenta' : 'Iniciar sesión'}
             <ArrowRight size={17} />
           </Button>
